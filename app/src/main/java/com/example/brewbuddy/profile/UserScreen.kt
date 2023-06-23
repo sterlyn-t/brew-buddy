@@ -38,6 +38,7 @@ import com.example.brewbuddy.R
 import com.example.brewbuddy.getUser
 import com.example.brewbuddy.ui.theme.GreyLight
 import com.example.brewbuddy.ui.theme.GreyMedium
+import com.example.brewbuddy.ui.theme.Screen
 import com.example.brewbuddy.ui.theme.TitleLarge
 
 private fun getIndex(currentIndex: Int, startIndex: Int, pageCount: Int): Int {
@@ -76,14 +77,18 @@ fun Carousel() {
                 val page = getIndex(index, startIndex, pageCount)
 
                 Box(contentAlignment = Alignment.Center) {
-                    CardWithIconAndTitle(modifier = Modifier.width(200.dp).height(150.dp))
+                    CardWithIconAndTitle(modifier = Modifier
+                        .width(200.dp)
+                        .height(150.dp))
 
                 }
             },
         )
 
         Row(
-            modifier=Modifier.align(Alignment.CenterHorizontally).padding(top=10.dp),
+            modifier= Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             repeat(pageCount) { index ->
@@ -103,13 +108,15 @@ fun Carousel() {
 @Composable
 fun UserScreen(menuButton: @Composable () -> Unit) {
     val user = getUser()
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        ProfileHeader(user, menuButton)
-        Column() {
-            TitleLarge(text="Pinned Recipes")
-            Carousel()
+    Screen() {
+        Column(modifier = Modifier.fillMaxSize()) {
+            ProfileHeader(user, menuButton)
+            Column() {
+                TitleLarge(text="Pinned Recipes")
+                Carousel()
+            }
         }
+
     }
 }
 

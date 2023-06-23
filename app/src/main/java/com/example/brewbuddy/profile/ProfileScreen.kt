@@ -72,13 +72,16 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.HorizontalAlignmentLine
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.brewbuddy.profile.PreferencesScreen
 import com.example.brewbuddy.profile.SettingScreen
 import com.example.brewbuddy.profile.User
 import com.example.brewbuddy.profile.UserScreen
@@ -89,7 +92,7 @@ import kotlinx.coroutines.CoroutineScope
 
 sealed class ProfileScreens(val route: String, val label: String) {
     object User : ProfileScreens("profile/user", "Profile")
-    object PinnedRecipes : ProfileScreens("profile/pinned_recipes", "Pinned Recipes")
+    object Preferences : ProfileScreens("profile/preferences", "Preferences")
     object Settings : ProfileScreens("profile/settings", "Settings")
 }
 
@@ -138,6 +141,7 @@ fun ProfileScreen() {
     val vmStoreOwner = rememberViewModelStoreOwner()
     val menuItems = listOf(
         ProfileScreens.User,
+        ProfileScreens.Preferences,
         ProfileScreens.Settings
     )
     ModalNavigationDrawer(
@@ -162,6 +166,9 @@ fun ProfileScreen() {
 
                     composable(ProfileScreens.Settings.route) {
                         SettingScreen(menuButton = {MenuButton(coroutineScope, menuDrawerState)})
+                    }
+                    composable(ProfileScreens.Preferences.route) {
+                        PreferencesScreen(menuButton = {MenuButton(coroutineScope, menuDrawerState)})
                     }
 
                 }
@@ -231,7 +238,9 @@ private fun ProfileMenu(
             shape = RectangleShape
         ) {
             Row(
-                modifier = Modifier.padding(top=20.dp, bottom=20.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(top = 20.dp, bottom = 20.dp)
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
                 ProfilePicture(user!!.getAvatar(), 64.dp)
@@ -273,6 +282,30 @@ private fun ProfileMenu(
                     selectedTextColor = selectedColor
                 )
             )
+
+        }
+        Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.Bottom, horizontalArrangement =Arrangement.Start) {
+            Button(
+                onClick = {
+                  // do login stuff
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset(y = -75.dp), // it disappears under the main menu otherwise
+                colors=ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent, contentColor = Color.Black
+                ),
+                shape = RectangleShape,
+            ) {
+                Text(
+                    text="Sign Out",
+                    style=MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                        .fillMaxWidth(),
+                    textAlign= TextAlign.Left
+                )
+            }
 
         }
     }
