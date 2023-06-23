@@ -1,5 +1,6 @@
 package com.example.brewbuddy
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
@@ -20,7 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
@@ -44,13 +44,16 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.MutableState
 import com.example.brewbuddy.ui.theme.GreyLight
 import com.example.brewbuddy.ui.theme.GreyMedium
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -59,11 +62,11 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.brewbuddy.randomSizedPhotos as randomSizedPhotos
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecipesScreen(
     name: String
 ) {
+    val openRecipeModal = remember { mutableStateOf(false)}
     Surface(modifier = Modifier.fillMaxSize(), color= MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier
@@ -74,7 +77,7 @@ fun RecipesScreen(
                     end = 0.dp
                 )
         ) {
-            RecipeGridLayout()
+            RecipeGridLayout(openRecipeModal = openRecipeModal)
         }
     }
 }
@@ -109,40 +112,39 @@ private fun CardTitle(text: String, fontSize: TextUnit) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun RecipeGridLayout() {
-    val spanCount = 2
- LazyVerticalStaggeredGrid(
-        columns = StaggeredGridCells.Fixed(2),
-        verticalItemSpacing = 10.dp,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .height(500.dp)
-    ) {
-
-        item( span = StaggeredGridItemSpan.FullLine) {
-            Heading(text = "Popular")
-        }
-        item(
-            span = StaggeredGridItemSpan.FullLine
+private fun RecipeGridLayout(openRecipeModal: MutableState<Boolean>) {
+     LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(2),
+            verticalItemSpacing = 14.dp,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .height(500.dp)
         ) {
-            Carousel(
-                itemsCount = shorterList.size,
-                itemContent = {  index ->
-                    PopularCard(photo = randomSizedPhotos[index])
-                })
-        }
-        item(
-          span = StaggeredGridItemSpan.FullLine
-         ) {
-         Heading(text = "Picked for you")
+
+            item( span = StaggeredGridItemSpan.FullLine) {
+                Heading(text = "Popular")
+            }
+            item(
+                span = StaggeredGridItemSpan.FullLine
+            ) {
+                Carousel(
+                    itemsCount = shorterList.size,
+                    itemContent = {  index ->
+                        PopularCard(photo = randomSizedPhotos[index])
+                    })
+            }
+            item(
+              span = StaggeredGridItemSpan.FullLine
+             ) {
+             Heading(text = "Picked for you")
+         }
+            items(randomSizedPhotos) { photo ->
+                RecipeCard(photo = photo, openRecipeModal = openRecipeModal)
+            }
      }
-        items(randomSizedPhotos) { photo -> 
-            RecipeCard(photo = photo)
-        }
- }
  }
 
 
@@ -193,12 +195,9 @@ private fun PopularCard(photo: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun RecipeCard(photo: String) {
-    var heightIndex = photo.lastIndexOf("/")
-    var photoHeight = photo.substring(heightIndex + 1, photo.length).toInt()
-    var topPadding = (photoHeight - 400)/2
+private fun RecipeCard(photo: String, openRecipeModal: MutableState<Boolean>) {
     Card(
-        onClick = { },
+        onClick = {},
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 15.dp
@@ -206,66 +205,109 @@ private fun RecipeCard(photo: String) {
         modifier = Modifier.fillMaxWidth()
 
     ) {
-        Box() {
-        AsyncImage(
-            model = photo,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .fillMaxHeight()
-        )
-        Row() {
-            Box(modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_page),
-                    contentDescription = "Location Pin Icon",
-                    modifier = Modifier.size(36.dp),
-                    tint = Color.White
-                )
-            }
-        }
-        Row(
-            modifier = Modifier
-                .padding
-                    (
-                    start = 0.dp,
-                    top = 130.dp,
-                    end = 0.dp,
-                    bottom = 0.dp
-                )
-        )
-        {
             Box() {
+                AsyncImage(
+                    model = photo,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .fillMaxHeight()
+                )
+            Row() {
                 Box(modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
-                    CardTitle(
-                        "Card Title Testing Longer Ones",
-                        fontSize = 24.sp
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_page),
+                        contentDescription = "Location Pin Icon",
+                        modifier = Modifier.size(36.dp),
+                        tint = Color.White
                     )
                 }
-                Row(
-                    modifier = Modifier
-                        .padding
-                            (
-                            start = 0.dp,
-                            top = 120.dp,
-                            end = 8.dp,
-                            bottom = 8.dp
+            }
+            Row(
+                modifier = Modifier
+                    .padding
+                        (
+                        start = 0.dp,
+                        top = 130.dp,
+                        end = 0.dp,
+                        bottom = 0.dp
+                    )
+            )
+            {
+                Box() {
+                    Box(modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
+                        CardTitle(
+                            "Card Title Testing Longer Ones",
+                            fontSize = 24.sp
                         )
-                        .align(Alignment.CenterEnd)
-                ) {
-                    Text("John Doe", color = Color.White, fontSize = 18.sp)
-                    Box( Modifier.padding(horizontal = 4.dp, vertical = 0.dp)) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.icon_user),
-                            contentDescription = "user icon placeholedr"
-                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .padding
+                                (
+                                start = 0.dp,
+                                top = 120.dp,
+                                end = 8.dp,
+                                bottom = 8.dp
+                            )
+                            .align(Alignment.CenterEnd)
+                    ) {
+                        Text("John Doe", color = Color.White, fontSize = 18.sp)
+                        Box( Modifier.padding(horizontal = 6.dp, vertical = 0.dp).size(30.dp), contentAlignment = Alignment.Center) {
+                            Canvas(modifier = Modifier.fillMaxSize()) {
+                                drawCircle(SolidColor(Color.White))
+                            }
+                            Icon(
+                                painter = painterResource(id = R.drawable.icon_user),
+                                contentDescription = "User image placeholder"
+                            )
+                        }
                     }
                 }
             }
         }
     }
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun Carousel(
+    modifier: Modifier = Modifier,
+    pagerState: PagerState = remember { PagerState() },
+    itemsCount: Int,
+    itemContent: @Composable (index: Int) -> Unit,
+) {
+    val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
+
+    Box(
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        HorizontalPager(pageCount = itemsCount, state = pagerState, pageSize = PageSize.Fixed(300.dp), pageSpacing = 8.dp) { page ->
+            itemContent(page)
+        }
+    }
+    Box(modifier = modifier
+        .fillMaxWidth()
+        .padding(top = 2.dp, start = 0.dp, end = 0.dp, bottom = 12.dp)
+        .offset(x = 0.dp, y = 200.dp)
+    )
+    {
+        Surface(
+            modifier = Modifier
+                .align(Alignment.BottomCenter),
+            shape = CircleShape,
+            color = Color.Transparent
+        ) {
+            DotsIndicator(
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                totalDots = itemsCount,
+                selectedIndex = if (isDragged) pagerState.currentPage else pagerState.targetPage,
+                dotSize = 12.dp
+            )
+        }
     }
 }
 
@@ -310,44 +352,6 @@ fun DotsIndicator(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun Carousel(
-    modifier: Modifier = Modifier,
-    pagerState: PagerState = remember { PagerState() },
-    itemsCount: Int,
-    itemContent: @Composable (index: Int) -> Unit,
-) {
-    val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
-
-    Box(
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        HorizontalPager(pageCount = itemsCount, state = pagerState, pageSize = PageSize.Fixed(300.dp), pageSpacing = 8.dp) { page ->
-            itemContent(page)
-        }
-    }
-    Box(modifier = modifier
-        .fillMaxWidth()
-        .padding(top = 2.dp, start = 0.dp, end = 0.dp, bottom = 12.dp)
-        .offset(x = 0.dp, y = 200.dp)
-    )
-    {
-        Surface(
-            modifier = Modifier
-                .align(Alignment.BottomCenter),
-            shape = CircleShape,
-            color = Color.Transparent
-        ) {
-            DotsIndicator(
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
-                totalDots = itemsCount,
-                selectedIndex = if (isDragged) pagerState.currentPage else pagerState.targetPage,
-                dotSize = 12.dp
-            )
-        }
-    }
-}
 
 
 private val randomSizedPhotos = listOf(
