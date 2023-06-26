@@ -21,8 +21,8 @@ class CurrentUserViewModel : ViewModel() {
         currentUser.postValue(user);
     }
 
-    fun getUser(): User? {
-        return currentUser.value
+    fun getUser(): User {
+        return currentUser.value!!
     }
 
     private fun validateUser(username: String, password: String): Boolean {

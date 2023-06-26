@@ -29,13 +29,19 @@ val Typography = Typography(
         titleLarge = TextStyle(
                 fontFamily = InterFont,
                 fontWeight = FontWeight.Bold,
-                fontSize = 32.sp,
+                fontSize = 28.sp,
                 letterSpacing = 0.sp
         ),
         titleMedium = TextStyle(
                 fontFamily = InterFont,
                 fontWeight = FontWeight.Medium,
                 fontSize = 22.sp,
+                letterSpacing = 0.sp
+        ),
+        titleSmall = TextStyle(
+                fontFamily = InterFont,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
                 letterSpacing = 0.sp
         ),
         labelSmall = TextStyle(
