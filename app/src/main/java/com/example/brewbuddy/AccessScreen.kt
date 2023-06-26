@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -40,7 +39,6 @@ import com.example.brewbuddy.ui.theme.InterFont
 import com.example.brewbuddy.ui.theme.OrangeBrownMedium
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -55,8 +53,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.res.painterResource
 
 sealed class AccessScreens(val route: String, @StringRes val resourceId: Int) {
     object Login : AccessScreens("Profile", R.string.login_route)
@@ -66,14 +62,11 @@ sealed class AccessScreens(val route: String, @StringRes val resourceId: Int) {
 @Composable
 fun FormWrapper(content: @Composable ColumnScope.() -> Unit) {
     Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(bottom = 200.dp),
+        Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
-    ) {
-        content()
-    }
+        verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically),
+        content = content
+    )
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,7 +78,6 @@ fun LoginScreen(navController: NavController) {
 
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
-    var passwordVisible by remember { mutableStateOf(false) }
 
     val errorMsg = remember {mutableStateOf("")}
 
@@ -97,90 +89,67 @@ fun LoginScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize(),
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            FormWrapper() {
-                Title()
-                TextField(
-                    value = username,
-                    onValueChange = {
-                        if(it.text. matches(alphanumericFilter)){
-                            username = it
-                        }
-                    },
-                    placeholder = { Text(text = "Username")},
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    keyboardActions = KeyboardActions(
-                        onNext = {
-                            passwordFocusRequester.requestFocus()
-                        }
-                    ),
-                    modifier = Modifier.focusRequester(focusRequester)
-                )
-                TextField(
-                    value = password,
-                    onValueChange = {
-                        if(it.text. matches(nonWhitespaceFilter)){
-                            password = it
-                        }
+        FormWrapper() {
+            Title()
+            TextField(
+                value = username,
+                onValueChange = {
+                    if(it.text. matches(alphanumericFilter)){
+                        username = it
+                    }
+                },
+                placeholder = { Text(text = "Username")},
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        passwordFocusRequester.requestFocus()
+                    }
+                ),
+                modifier = Modifier.focusRequester(focusRequester)
+            )
+            TextField(
+                value = password,
+                onValueChange = {
+                    if(it.text. matches(nonWhitespaceFilter)){
+                        password = it
+                    }
 
-                        isLoginEnabled = username.text.isNotBlank() && password.text.isNotBlank()
-                    },
-                    placeholder = { Text(text = "Password")},
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(
-                            onClick = { passwordVisible = !passwordVisible },
-                            modifier = Modifier.padding(end = 4.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(if (passwordVisible) R.drawable.baseline_visibility_off_24 else R.drawable.baseline_visibility_24),
-                                contentDescription = if (passwordVisible) "Hide password" else "Show password"
-                            )
+                    isLoginEnabled = username.text.isNotBlank() && password.text.isNotBlank()
+                },
+                placeholder = { Text(text = "Password")},
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (isLoginEnabled) {
+                            loginUser(username.text, password.text, isLoginEnabled, errorMsg, currentUserViewModel)
                         }
-                    },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            if (isLoginEnabled) {
-                                val loginSuccessful = currentUserViewModel.loginUser(username.text, password.text)
-                                if (!loginSuccessful) {
-                                    password = TextFieldValue("") // Clear the password field
-                                    errorMsg.value = "Incorrect password or username."
-                                }
-                            }
-                        }
-                    ),
-                    modifier = Modifier.focusRequester(passwordFocusRequester)
+                    }
+                ),
+                modifier = Modifier.focusRequester(passwordFocusRequester)
+            )
+            Button(
+                onClick = { loginUser(username.text, password.text, isLoginEnabled, errorMsg, currentUserViewModel) },
+                colors = ButtonDefaults.buttonColors(containerColor = GreenMedium),
+                modifier= Modifier.size(width=280.dp, height=40.dp),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text("LOGIN")
+            }
+            ErrorMessage(errorMsg.value)
+        }
+        Row(
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            Button(
+                onClick={navController.navigate(AccessScreens.Register.route)},
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor=MaterialTheme.colorScheme.primary
                 )
-                Button(
-                    onClick = {
-                        val loginSuccessful = loginUser(username.text, password.text, isLoginEnabled, errorMsg, currentUserViewModel)
-                        if (!loginSuccessful) {
-                            password = TextFieldValue("") // Clear the password field
-                            errorMsg.value = "Incorrect password or username."
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = GreenMedium),
-                    modifier= Modifier.size(width=280.dp, height=40.dp),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    Text("LOGIN")
-                }
-                ErrorMessage(errorMsg.value)
-                Button(
-                    onClick = { navController.navigate(AccessScreens.Register.route) },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        contentColor = MaterialTheme.colorScheme.primary
-                    )
-                    //modifier = Modifier.padding(top = 16.dp)
-                ) {
-                    Text(text = "Sign up")
-                }
+            ) {
+                Text(text = "Sign up")
             }
         }
     }
@@ -279,24 +248,12 @@ fun ErrorMessage(text: String) {
 @Composable
 fun Title(color: Color = OrangeBrownMedium) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-        Text(
-            text="brew",
-            style=TextStyle(
-                fontFamily = InterFont,
-                fontWeight = FontWeight.Bold,
-                fontSize = 32.sp,
-                letterSpacing = 0.sp
-            ),
-            color= color)
-        Text(
-            text="buddy",
-            style=TextStyle(
-                fontFamily = InterFont,
-                fontSize = 32.sp,
-                letterSpacing = 0.sp
-            ),
-            color= color
-        )
+        Text(text="brew", style=MaterialTheme.typography.titleLarge, color= color)
+        Text(text="buddy", style=TextStyle(
+            fontFamily = InterFont,
+            fontSize = 32.sp,
+            letterSpacing = 0.sp
+        ), color= color)
     }
 }
 @Composable
@@ -322,15 +279,12 @@ fun AccessScreen() {
     }
 }
 
-private fun loginUser(username: String, password: String, isLoginEnabled: Boolean, errorMsg: MutableState<String>, currentUserViewModel: CurrentUserViewModel): Boolean {
+private fun loginUser(username: String, password: String, isLoginEnabled: Boolean, errorMsg: MutableState<String>, currentUserViewModel: CurrentUserViewModel) {
     if (isLoginEnabled) {
-        val loginSuccessful = currentUserViewModel.loginUser(username, password)
-        errorMsg.value = if (!loginSuccessful) {
+        errorMsg.value = if (!currentUserViewModel.loginUser(username, password)) {
             "Incorrect password or username."
         } else {
             ""
         }
-        return loginSuccessful
     }
-    return false
 }

@@ -26,7 +26,6 @@ import com.example.brewbuddy.ui.theme.GreyLight
 import com.example.brewbuddy.ui.theme.SlateLight
 import androidx.compose.runtime.*
 import com.example.brewbuddy.ui.theme.GreyMedium
-import com.example.brewbuddy.ui.theme.currentRoute
 
 sealed class BottomNavigationScreens(val route: String, @StringRes val resourceId: Int, @DrawableRes val icon: Int) {
     object Profile : BottomNavigationScreens("Profile", R.string.profile_route, R.drawable.icon_user)
@@ -86,4 +85,8 @@ private fun CenteredBottomAppBar(
             content = content
         )
     }
+}
+@Composable
+private fun currentRoute(navController: NavHostController): String? {
+    return navController.currentBackStackEntry?.destination?.route
 }

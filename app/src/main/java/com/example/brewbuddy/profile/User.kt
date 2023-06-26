@@ -1,22 +1,13 @@
 package com.example.brewbuddy.profile
 
-import com.example.brewbuddy.R
+import android.util.Log
 
 class User {
 
     var firstName: String = "";
     var lastName: String = "";
-    private var username: String = "";
-    private var profilePicture: Int = R.drawable.profile_picture
+    var username: String = "";
     constructor(username: String) {
         this.username = username
-    }
-
-    fun getUsername(): String {
-        return username
-    }
-
-    fun getAvatar(): Int {
-        return profilePicture;
     }
 }
