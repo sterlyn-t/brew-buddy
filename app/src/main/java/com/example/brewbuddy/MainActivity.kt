@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.brewbuddy.ui.theme.BrewBuddyTheme
+import androidx.compose.foundation.layout.Column
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,7 +23,10 @@ class MainActivity : ComponentActivity() {
             BrewBuddyTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    Greeting("BrewBuddy")
+                    Column(Modifier.fillMaxSize()) {
+                        Greeting("BrewBuddy")
+                        NavBar()
+                    }
                 }
             }
         }
@@ -36,6 +40,15 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
             text = "Hello from $name!",
             modifier = modifier.padding(24.dp)
         )
+    }
+}
+
+@Composable
+fun NavBar() {
+    Row(Modifier.background(Color.Gray).fillMaxWidth().padding(16.dp)) {
+        Text("Home", Modifier.padding(8.dp).clickable { /* Handle click event */ })
+        Text("Profile", Modifier.padding(8.dp).clickable { /* Handle click event */ })
+        Text("Settings", Modifier.padding(8.dp).clickable { /* Handle click event */ })
     }
 }
 
