@@ -75,6 +75,7 @@ import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -85,6 +86,7 @@ import com.example.brewbuddy.profile.PreferencesScreen
 import com.example.brewbuddy.profile.SettingScreen
 import com.example.brewbuddy.profile.User
 import com.example.brewbuddy.profile.UserScreen
+import com.example.brewbuddy.recipes.Recipe
 import com.example.brewbuddy.ui.theme.OrangeBrownMedium
 import com.example.brewbuddy.ui.theme.TitleLarge
 import com.example.brewbuddy.ui.theme.currentRoute
@@ -102,19 +104,38 @@ fun getUser(): User {
     return currentUserViewModel.getUser()
 }
 @Composable
-fun CardWithIconAndTitle(modifier: Modifier) {
+fun PinnedCard(modifier: Modifier, recipe: Recipe) {
     Card(modifier) {
-        val user = getUser()
-        val username = user.getUsername()
-        Row(modifier = Modifier.padding(16.dp)) {
-            Icon(Icons.Filled.Face, contentDescription = "Localized description")
+        Row(modifier = Modifier.padding(16.dp).background(Color.Transparent), verticalAlignment = Alignment.Bottom) {
+            Column(modifier = Modifier.weight(1f).background(Color.Transparent)){
+                Text(
+                    text = recipe.getName(),
+                    color= Color.White,
+                    modifier = Modifier.align(alignment = Alignment.Start)
+                )
+            }
+
+            Column(modifier = Modifier.weight(1f).background(Color.Transparent)){
+                Icon(
+                    Icons.Filled.LocationOn,
+                    contentDescription = "Localized description",
+                    tint = Color.White,
+                    modifier = Modifier.align(alignment = Alignment.End)
+                )
+            }
+
         }
-        Row(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = username,
-//                style = InterFont,
+        Box(modifier = Modifier.fillMaxSize().zIndex(2f)) {
+            Image(
+                painter = painterResource(id = recipe.getThumbNail()),
+                contentDescription = "Recipe Thumbnail",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+                alpha = 0.7F
+
             )
         }
+
     }
 }
 

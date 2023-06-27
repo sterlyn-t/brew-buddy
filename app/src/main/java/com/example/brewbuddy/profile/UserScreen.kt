@@ -28,14 +28,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.brewbuddy.CardWithIconAndTitle
+import com.example.brewbuddy.PinnedCard
 import com.example.brewbuddy.ProfilePicture
 import com.example.brewbuddy.R
 import com.example.brewbuddy.getUser
+import com.example.brewbuddy.recipes.Recipe
 import com.example.brewbuddy.ui.theme.GreyLight
 import com.example.brewbuddy.ui.theme.GreyMedium
 import com.example.brewbuddy.ui.theme.Screen
@@ -63,6 +65,8 @@ fun Carousel() {
     }
     val focusColor = GreyMedium
     val unfocusedColor = GreyLight
+    val tempRecipe = Recipe("Latte")
+
     Column(modifier=Modifier.fillMaxWidth()) {
 
         HorizontalPager(
@@ -77,10 +81,7 @@ fun Carousel() {
                 val page = getIndex(index, startIndex, pageCount)
 
                 Box(contentAlignment = Alignment.Center) {
-                    CardWithIconAndTitle(modifier = Modifier
-                        .width(200.dp)
-                        .height(150.dp))
-
+                    PinnedCard(modifier = Modifier.width(200.dp).height(150.dp), tempRecipe)
                 }
             },
         )
