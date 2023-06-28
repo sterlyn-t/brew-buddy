@@ -73,6 +73,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.HorizontalAlignmentLine
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -90,6 +91,7 @@ import com.example.brewbuddy.ui.theme.TitleLarge
 import com.example.brewbuddy.ui.theme.currentRoute
 import kotlinx.coroutines.CoroutineScope
 
+
 sealed class ProfileScreens(val route: String, val label: String) {
     object User : ProfileScreens("profile/user", "Profile")
     object PinnedRecipes : ProfileScreens("profile/pinned_recipes", "Pinned Recipes")
@@ -104,14 +106,17 @@ fun getUser(): User {
 @Composable
 fun PinnedCard(modifier: Modifier, recipe: Recipe) {
     Card(modifier) {
-        Box(modifier = Modifier.fillMaxSize().zIndex(2f).background(
-            brush = Brush.verticalGradient(
-                colors = listOf(
-                    Color.Black,
-                    Color.Transparent
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .zIndex(2f)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color.Black,
+                        Color.Transparent
+                    )
                 )
-            )
-        )) {
+            )) {
             Image(
                 painter = painterResource(id = recipe.getThumbNail()),
                 contentDescription = "Recipe Thumbnail",
@@ -120,8 +125,12 @@ fun PinnedCard(modifier: Modifier, recipe: Recipe) {
                 alpha = 0.6F
 
             )
-            Row(modifier = Modifier.padding(16.dp).background(Color.Transparent), verticalAlignment = Alignment.Bottom) {
-                Column(modifier = Modifier.weight(1f).background(Color.Transparent)){
+            Row(modifier = Modifier
+                .padding(16.dp)
+                .background(Color.Transparent), verticalAlignment = Alignment.Bottom) {
+                Column(modifier = Modifier
+                    .weight(1f)
+                    .background(Color.Transparent)){
                     Text(
                         text = recipe.getName(),
                         color= Color.White,
@@ -129,7 +138,9 @@ fun PinnedCard(modifier: Modifier, recipe: Recipe) {
                     )
                 }
 
-                Column(modifier = Modifier.weight(1f).background(Color.Transparent)){
+                Column(modifier = Modifier
+                    .weight(1f)
+                    .background(Color.Transparent)){
                     Icon(
                         Icons.Filled.LocationOn,
                         contentDescription = "Localized description",
@@ -259,7 +270,9 @@ private fun ProfileMenu(
             shape = RectangleShape
         ) {
             Row(
-                modifier = Modifier.padding(top=20.dp, bottom=20.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(top = 20.dp, bottom = 20.dp)
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
                 ProfilePicture(user!!.getAvatar(), 64.dp)
@@ -270,6 +283,7 @@ private fun ProfileMenu(
                         .align(Alignment.CenterVertically)
                         .padding(start = 10.dp))
             }
+            UserScreen(onEditProfileClick = {})  
 
         }
         items.forEach { item ->
@@ -305,3 +319,82 @@ private fun ProfileMenu(
         }
     }
 }
+
+//@Composable
+//fun EditButton(onClick: () -> Unit) {
+//    Button(
+//        onClick = onClick,
+//        colors = ButtonDefaults.buttonColors(
+//            //backgroundColor = Color.Blue, // Set the background color of the button
+//            contentColor = Color.White // Set the color of the button content (text)
+//        )
+//    ) {
+//        Text(text = "Edit Profile")
+//    }
+//}
+//
+////@Composable
+////fun EditButton(onClick: () -> Unit) {
+////    Button(
+////        onClick = onClick,
+////        colors = ButtonDefaults.buttonColors(
+////            backgroundColor = Color.Blue,
+////            contentColor = Color.White
+////        )
+////    })
+////    {
+////        Text(text = "Edit user profile")
+////    }
+////
+////}
+//
+//@Composable
+//fun UserScreen(user: User, onEditProfileClick: () -> Unit) {
+//    Column {
+//        // Display user information
+//        Text(text = "Name: Name")
+//        Text(text = "Email: email")
+//        EditButton(onClick = onEditProfileClick)
+//    }
+//}
+////@Composable
+////fun UserScreen(user: User, onEditProfileClick: () -> Unit) {
+////        // ...
+////    EditButton(onClick = {
+////            // Handle the edit button click event here
+////        })
+////    }
+//
+//@Preview
+//@Composable
+//fun PreviewUserScreen() {
+//    val user = User("John Doe")
+//    UserScreen(user = user, onEditProfileClick = {})
+//}
+
+@Composable
+fun UserScreen(onEditProfileClick: () -> Unit) {
+    Column {
+        // Display user information
+        Text(text = "Name: John Doe")
+        Text(text = "Email: johndoe@example.com")
+        EditButton(onClick = onEditProfileClick)
+    }
+}
+
+@Composable
+fun EditButton(onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier.padding(16.dp) // Add some padding to the button
+    ) {
+        Text(text = "Edit Profile")
+    }
+}
+
+@Composable
+fun PreviewUserScreen() {
+    UserScreen(onEditProfileClick = {})
+}
+
+
