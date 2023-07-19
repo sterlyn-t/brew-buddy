@@ -1,11 +1,11 @@
 package com.example.brewbuddy.data.repository
 import android.util.Log
-import com.example.brewbuddy.data.remote.dto.Instructions
 import com.example.brewbuddy.data.remote.dto.RecipeDto
 import com.example.brewbuddy.data.remote.dto.RecipeMetadataDto
+import com.example.brewbuddy.data.remote.dto.UserMetadataDto
 import com.example.brewbuddy.domain.repository.RecipeRepository
 import com.example.brewbuddy.requests.getFunctions
-import com.example.brewbuddy.domain.model.Author
+import com.example.brewbuddy.domain.model.UserMetadata
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.tasks.await
@@ -41,6 +41,20 @@ class RecipeRepositoryImplementation @Inject constructor () : RecipeRepository {
             val task = dataDeferred.await()
             val data = task.data as HashMap<String, Object>
             return@withContext RecipeDto.from(data)
+        }
+    }
+
+    override suspend fun getUserMetadata(id: String): UserMetadataDto {
+        Log.d("GET_USER_BY_ID", id)
+        return withContext(Dispatchers.IO) {
+            val dataDeferred = async {
+                getFunctions()
+                    .getHttpsCallable("getUserById")
+                    .call(hashMapOf("userId" to id)).await()
+            }
+            val task = dataDeferred.await()
+            val data = task.data as HashMap<String, Object>
+            return@withContext UserMetadataDto.from(data)
         }
     }
 

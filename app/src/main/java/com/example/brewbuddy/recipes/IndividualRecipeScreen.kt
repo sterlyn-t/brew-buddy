@@ -1,5 +1,6 @@
 package com.example.brewbuddy.recipes
 
+import android.os.Bundle
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
@@ -51,15 +52,21 @@ import com.example.brewbuddy.R
 import com.example.brewbuddy.data.remote.dto.IngredientList
 import com.example.brewbuddy.domain.model.Author
 import com.example.brewbuddy.domain.model.Recipe
+import com.example.brewbuddy.domain.use_case.analytics_manager.LocalAnalytics
 import com.example.brewbuddy.ui.theme.Brown
 import com.example.brewbuddy.ui.theme.Cream
 import com.example.brewbuddy.ui.theme.GreenLight
 import com.example.brewbuddy.ui.theme.TitleLarge
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.ktx.Firebase
 
 
 sealed class RecipeNavigationScreens(val route: String) {
     object IndividualRecipe : RecipeNavigationScreens("Recipes/{recipeId}")
 }
+private val firebaseAnalytics = Firebase.analytics
 
 @Composable
 fun IndividualRecipeScreen(
@@ -95,10 +102,11 @@ fun IndividualRecipeScreen(
             ) {
                 Box() {
                     RecipeBanner(
+                        state.recipe!!.id!!,
                         state.recipe!!.bannerUrl!!,
                         state.recipe!!.title!!,
+                        state.recipe!!.author!!,
                         navController,
-                        state.recipe!!.author!!
                     )
                 }
                 Box(
@@ -115,9 +123,24 @@ fun IndividualRecipeScreen(
     }
 }
 
+private fun logAnalyticsEvent(id: String) {
+    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
+        param(FirebaseAnalytics.Param.ITEM_ID, id)
+    }
+}
 @Composable
-private fun RecipeBanner(img: String, title: String, navController: NavHostController, author: Author) {
+private fun RecipeBanner(
+    id: String,
+    img: String,
+    title: String,
+    author: Author,
+    navController: NavHostController,
+) {
     val contextForToast = LocalContext.current.applicationContext
+    val analyticsManager = LocalAnalytics.current
+    var params: Bundle =  Bundle()
+    params.putString("RECIPE_ID", id)
+
     Box(modifier = Modifier
         .height(230.dp)
         .fillMaxWidth(),
@@ -165,7 +188,13 @@ private fun RecipeBanner(img: String, title: String, navController: NavHostContr
                     horizontalArrangement = Arrangement.End
                 ) {
                     Box( modifier = Modifier.align(Alignment.CenterVertically)) {
-                        IconButton(onClick = { Toast.makeText(contextForToast, "Added to Favourites", Toast.LENGTH_SHORT).show()}) {
+                        IconButton(
+                            onClick =
+                            {
+                                analyticsManager?.logEventWithParams("added_to_wishlist", params)
+                                Toast.makeText(contextForToast, "Added to Favourites", Toast.LENGTH_SHORT).show()
+                            }
+                        ) {
                             Canvas(modifier = Modifier.size(38.dp)) {
                                 drawCircle(color = Cream)
                             }
