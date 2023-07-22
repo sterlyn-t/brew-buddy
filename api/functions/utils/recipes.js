@@ -86,18 +86,26 @@ exports.getRecipes = (db) => {
     });
 };
 
+
+
 exports.getRecipesMetadata = (db) => {
   return db
     .collection("recipes")
     .get()
     .then((snapshot) => {
-      return snapshot.docs.map((doc) => ({
+      const metadata = snapshot.docs.map((doc) => ({
         id: doc.id,
         bannerUrl: doc.data().bannerUrl,
         title: doc.data().title,
         likes: doc.data().likes,
         authorId: doc.data().authorId,
+        vegan: doc.data().vegan,
+        vegetarian: doc.data().vegetarian,
+        glutenFree: doc.data().glutenFree,
+        dairyFree: doc.data().dairyFree
       }));
+      console.log("here: ", metadata);
+      return metadata
     });
 };
 

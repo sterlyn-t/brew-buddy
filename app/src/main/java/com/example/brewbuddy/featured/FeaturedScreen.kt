@@ -166,6 +166,7 @@ private fun PopularRecipes(viewModel: FeaturedViewModel, navController: NavHostC
 @Composable
 private fun GridLayout(navController: NavHostController, viewModel: FeaturedViewModel) {
     val state = viewModel.recipeState.value
+    val test = viewModel.recommendedRecipes.value
 
     val height = ((state.data.size*200) + 70).dp
     Column() {
@@ -179,7 +180,7 @@ private fun GridLayout(navController: NavHostController, viewModel: FeaturedView
                 .fillMaxSize()
                 .height(height)
         ) {
-            items(state.data) {
+            items(test.data) {
                     recipe ->
                 RecipeCard(recipe, navController)
             }
@@ -300,9 +301,9 @@ private fun RecipeCard(recipe: RecipeMetadata, navController: NavHostController)
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Spacer(modifier = Modifier.weight(1f))
-                    Text(recipe.author.username, color = Color.White, fontSize = 18.sp)
+                    Text(recipe.author!!.username, color = Color.White, fontSize = 18.sp)
                     AsyncImage(
-                        model = recipe.author.avatarUrl,
+                        model = recipe.author!!.avatarUrl,
                         contentDescription = "Profile Picture",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier

@@ -31,6 +31,7 @@ const {
   getRecipes,
   getRecipesMetadata,
   getRecipeMetadataById,
+  getAllRecipesMetadatas,
   getRecipesMetadataByQuery,
 } = require("./utils/recipes.js");
 const { getUserById, updatePinnedRecipes } = require("./utils/users.js");
@@ -181,8 +182,13 @@ exports.getPopularRecipes = onCall(async ({ data }, context) => {
   return popularRecipes.slice(0, 5);
 });
 
+exports.getAllRecipesMetadatas = onCall(async ({ data }, context) => {
+  const metadatas = await getAllRecipesMetadatas(db);
+  return metadatas;
+});
+
 exports.getFeaturedRecipes = onCall(async ({ data }, context) => {
-  const metadatas = await getRecipesMetadata(db);
+  return await getRecipesMetadata(db);
 });
 
 // exports.createRecipe = onRequest(async ({ body }, response) => {
