@@ -165,6 +165,8 @@ const getQueryParams = (string) => {
     const entry = el.split("=");
     if (entry[0] === "keywords") {
       query["keywords"] = entry[1].toLowerCase().split(" ");
+    } else if (entry[0] === "sort") {
+      query["sort"] = entry[1];
     } else {
       query["filters"][entry[0]] = entry[1] === "true" ? true : false;
     }
@@ -179,9 +181,10 @@ exports.getRecipesMetadata = onCall(async ({ data }, context) => {
     const metadatas = await getRecipesMetadataByQuery(
       queryParams.keywords,
       queryParams.filters,
+      queryParams.sort,
       db
     );
-    console.log(metadatas);
+    // console.log(metadatas);
     return await getRecipesMetadataWithAuthor(metadatas, db);
   }
   const metadatas = await getRecipesMetadata(db);

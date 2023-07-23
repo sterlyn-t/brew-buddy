@@ -1,5 +1,12 @@
 const { HttpsError } = require("firebase-functions/v2/https");
 
+const sortingEquations = {
+  likesAsce: (a, b) => a.likes - b.likes,
+  likesDesc: (a, b) => b.likes - a.likes,
+};
+// const sortRecipes = (param, recipes) => {
+//   return recipes.sort(sortingEquations[param]);
+// };
 exports.getRecipeById = (recipeId, db) => {
   if (!recipeId) {
     throw new HttpsError(
@@ -100,7 +107,7 @@ exports.getRecipesMetadata = (db) => {
     });
 };
 
-exports.getRecipesMetadataByQuery = (keywords, filters, db) => {
+exports.getRecipesMetadataByQuery = (keywords, filters, sort, db) => {
   let queryRef = db.collection("recipes");
   console.log("keywords: ", keywords);
   if (keywords.length > 0) {
@@ -116,6 +123,11 @@ exports.getRecipesMetadataByQuery = (keywords, filters, db) => {
   }
 
   return queryRef.get().then((snapshot) => {
-    return snapshot.docs.map((doc) => extractMetadata(doc));
+    const res = snapshot.docs.map((doc) => extractMetadata(doc));
+    if (sort) {
+      res.sort(sortingEquations[sort]);
+    }
+    // console.log("Res: ", res);
+    return res;
   });
 };

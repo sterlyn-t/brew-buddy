@@ -68,6 +68,7 @@ class RecipeScreenViewModel  @Inject constructor(
                 string += "${el.name}=${el.enabled}"
             }
         }
+        Log.d("filterToString", string)
         return string
     }
 

@@ -1,9 +1,7 @@
 package com.example.brewbuddy
 
-//import com.example.brewbuddy.recipes.TagType
 import android.util.Log
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,7 +26,6 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -41,16 +38,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -60,13 +51,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.brewbuddy.domain.model.Author
@@ -78,11 +67,9 @@ import com.example.brewbuddy.ui.theme.Cream
 import com.example.brewbuddy.ui.theme.GreenLight
 import com.example.brewbuddy.ui.theme.GreenMedium
 import com.example.brewbuddy.ui.theme.SlateLight
-import com.example.brewbuddy.ui.theme.TitleLarge
 
 sealed class RecipeNavigationScreens(val route: String) {
     object IndividualRecipe : RecipeNavigationScreens("Recipes/{recipeId}")
-    object RecipeResults : RecipeNavigationScreens("Recipes/{queryParams}")
 }
 
 
@@ -255,6 +242,7 @@ private fun RecipeFilters(state: Boolean, onDismissRequest: () -> Unit, viewMode
                         text = { Text(filter.filterLabel) },
                         onClick = {
                             updateActiveFilters(filter, viewModel)
+                            viewModel.search()
                         }
                     )
                 }
@@ -273,41 +261,25 @@ private fun updateActiveFilters(
     viewModel: RecipeScreenViewModel
 ) {
 
-    val oldestToNewest = filters.last { filter: Filter -> filter.name == "dateAsce" }
-    val newestToOldest = filters.last { filter: Filter -> filter.name == "dateDesc" }
-    val priceLowToHigh = filters.last { filter: Filter -> filter.name == "priceAsce"}
-    val priceHighToLow = filters.last { filter: Filter -> filter.name == "priceDesc" }
+    val likesLowToHigh = SortFilters.last { filter: Filter -> filter.name == "likesAsce"}
+    val likesHighToLow = SortFilters.last { filter: Filter -> filter.name == "likesDesc" }
     if (viewModel.filters.contains(filterToAdd)) {
         viewModel.removeFilter(filterToAdd)
         return
     }
-    if (filterToAdd.name == "dateDesc"
-        && viewModel.filters.contains(oldestToNewest))
+
+    if (filterToAdd.name == "likesAsce"
+        && viewModel.filters.contains(likesHighToLow))
     {
-        viewModel.removeFilter(oldestToNewest)
-        viewModel.addFilter(filterToAdd)
-        return
-    }
-    if (filterToAdd.name == "dateAsce"
-        && viewModel.filters.contains(newestToOldest))
-    {
-        viewModel.removeFilter(newestToOldest)
+        viewModel.removeFilter(likesHighToLow)
         viewModel.addFilter(filterToAdd)
 
         return
     }
-    if (filterToAdd.name == "priceAsce"
-        && viewModel.filters.contains(priceHighToLow))
+    if (filterToAdd.name == "likesDesc"
+        && viewModel.filters.contains(likesLowToHigh))
     {
-        viewModel.removeFilter(priceHighToLow)
-        viewModel.addFilter(filterToAdd)
-
-        return
-    }
-    if (filterToAdd.name == "priceDesc"
-        && viewModel.filters.contains(priceLowToHigh))
-    {
-        viewModel.removeFilter(priceLowToHigh)
+        viewModel.removeFilter(likesLowToHigh)
         viewModel.addFilter(filterToAdd)
 
         return
@@ -469,19 +441,7 @@ private fun ResultCard(
                         .fillMaxHeight()
                         .padding(bottom = 8.dp)
                 ) {
-//                    Column() {
-//                        Row(modifier = Modifier.padding(bottom = 16.dp)) {
-//                            Text(text = price, fontSize = 20.sp)
-//                        }
-//                        Row() {
-//                            Text(
-//                                text = "$city, $province",
-//                                fontSize = 12.sp,
-//                                fontWeight = FontWeight.Light,
-//                                color = Color.DarkGray
-//                            )
-//                        }
-//                    }
+
                     Column(horizontalAlignment = Alignment.End) {
                         AuthorCardDisplay(author, textColor=Color.Black)
                     }
@@ -491,17 +451,9 @@ private fun ResultCard(
     }
 }
 //
-private val PreferenceFilters = listOf(
-    TagList.forEach {tagInfo ->
-        Filter(tagInfo.name, tagInfo.label, false);
-    }
-)
+
 
 private val SortFilters = listOf(
-    Filter("dateAsce", "Oldest to Newest", false),
-    Filter("dateDesc", "Newest to Oldest", false),
     Filter("likesAsce", "Popularity (Low to High)", false),
     Filter("likesDesc", "Popularity (High to Low)", false)
 )
-//
-//data class PreferenceFilter
