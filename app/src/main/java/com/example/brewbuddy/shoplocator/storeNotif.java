@@ -39,6 +39,14 @@ public class storeNotif extends FirebaseMessagingService {
                     "Heads Up Notification",
                     NotificationManager.IMPORTANCE_HIGH
             );
+
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        }
+
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            notificationManager.createNotificationChannel(channel);
         }
 
         Notification.Builder notification =
@@ -63,4 +71,5 @@ public class storeNotif extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
     }
 }
+
 
