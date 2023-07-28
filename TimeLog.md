@@ -141,4 +141,7 @@
 | 2023/07/24 |        |         | 1    |        |         |        | Adding diets, tags, keywords to recipe upload                                                                               |
 | 2023/07/24 |        |         |      |        | 5       |        | Massive refactor of classes and view models to fit MVVM                                                                               |
 | 2023/07/24 | 1      | 1       | 1    | 1      | 1       | 1      | Presentation planning                                                                                                       |
-| 2023/07/25 | 2      | 2       | 2    | 2      | 2       | 2      | Presentation recording                                                                                                      |
+| 2023/07/25 | 2      | 2       | 2    | 2      | 2       | 2      | Presentation recording                                                  | 2023/07/25 | 1      |         |      |        |         |        | Presentation editing + uploading                                                                                  |
+| 2023/07/26 | 3      |         |      |        |         |        | D6 work                                                                                  |
+| 2023/07/27 | 3      |         |      |        |         |        | D6 work                                                                                  |
+
